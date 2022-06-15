@@ -1,0 +1,107 @@
+enclave {
+    from "sgx_tae_service.edl" import *;
+
+    untrusted {
+        void ocall_print_string([in,string] const char *str);
+
+        void* ocall_malloc(size_t size);
+        void ocall_free([user_check] void *ptr);
+    };
+
+    trusted {
+        
+        int ecall_Pull_Request(
+            [out]  char** req,
+                   unsigned int* reqSize,
+            [out]  char** destIP,
+                   unsigned int* destIPSize,
+                   Data* data);
+
+        int ecall_Push_Request(
+            [out]  char** req,
+                   unsigned int* reqSize,
+            [out]  char** destIP,
+                   unsigned int* destIPSize,
+                   Data* data);
+
+        int ecall_Pull_Reply(char** ans,
+            [out]            unsigned int* ansSize,
+                             Data* data);
+
+        int ecall_Pull_Receive_Reply(std::string  ans, 
+                                     Data* data, 
+                                     std::string NodeType, 
+                                     unsigned int CyclonSize);
+
+        int ecall_Push_Receive_Request(std::string ans, 
+                                       Data* data, 
+                                       std::string NodeType, 
+                                       unsigned int CyclonSize);
+
+        void ecall_MergeView(int aL1, int bL2, int gL3, Data* data);
+
+        int ecall_Ping(char** req,
+            [out]      unsigned int* reqSize,
+                       char** destIP,
+            [out]      unsigned int* destIPSize,
+                       Data* data);
+
+        int ecall_Pong(char** ans,
+            [out]           unsigned int* ansSize,
+                       Data* data);
+
+
+        public int ecall_InitData(
+                                    unsigned int viewSize, 
+                                    unsigned int gossipSize,
+                                    unsigned int histPeriod,
+                                    unsigned long histSize,
+                                    float histExponent, 
+            [in,size=bsIPsSize]     char* bsIPs, 
+                                    unsigned int bsIPsSize, 
+            [in,size=myselfSize]    char* myself,
+                                    unsigned int myselfSize,
+            [in,size=privkeySize]   char* privkey,
+                                    unsigned int privkeySize,
+                                    unsigned int debug
+        );
+
+        public int ecall_SendRequest(
+            [user_check]    char** req, 
+            [out]           unsigned int* reqSize, 
+            [user_check]    char** destIP, 
+            [out]           unsigned int* destIPSize
+        );
+
+        public int ecall_ReceiveAnswer(
+            [in,size=ansSize]   char* ans, 
+                                unsigned int ansSize, 
+            [in,size=reqSize]   char* req, 
+                                unsigned int reqSize
+        );
+
+        public int ecall_ReceiveRequest(
+            [user_check]        char** ans, 
+            [out]               unsigned int* ansSize, 
+            [in,size=reqSize]   char* req, 
+                                unsigned int reqSize
+        );
+
+        public int ecall_GetHistoryView(
+            [user_check]    char** marshaled, 
+            [out]           unsigned int* marshaledSize
+        );
+
+        public int ecall_GetSgxView(
+            [user_check]    char** marshaled, 
+            [out]           unsigned int* marshaledSize
+        );
+
+        public int ecall_RebuildRoute(
+            [user_check]        char** ans, 
+            [out]               unsigned int* ansSize, 
+            [in,size=reqSize]   char* req, 
+                                unsigned int reqSize
+        );
+    };
+};
