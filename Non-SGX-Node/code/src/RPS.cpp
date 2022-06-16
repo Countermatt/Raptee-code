@@ -20,7 +20,7 @@ using namespace std;
 
 RPS::RPS(int rpsTcpPort, std::string bootstrapIP, std::string sgxId, int byz, std::string byzIP)
     : mListener(make_shared<TCPListener>(rpsTcpPort)),
-    mRpsTcpPort(rpsTcpPort), mPushReqCnt(0), mPullReqCnt(0), mPingReqCnt(0), mData(), mBrahms(), mCyclonSize(10), mbyz(byz), 
+    mRpsTcpPort(rpsTcpPort), mPushReqCnt(0), mPullReqCnt(0), mPingReqCnt(0), mData(), mBrahms(), mCyclonSize(10), mbyz(byz)
 {
 
   std::vector<std::string> btstIP;
@@ -93,8 +93,9 @@ void RPS::sendingThread()      // initiate RPS Request every RPS_SYNC_TIME
   /*
   for (unsigned long int i  = 0; i < mData.GlobalView().size(); i++)
       cout << mData.GlobalView()[i] << endl;
-  }
   */
+  }
+  
 }
 
 void RPS::listeningThread()
