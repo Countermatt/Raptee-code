@@ -248,5 +248,14 @@ extern "C" void ecall_MergeView(int aL1,
       data->GlobalAdd(e);
     }
   }
+  int tmp = 0;
+  auto globalView = data->GlobalView();
 
+  while ((int) data->GlobalView().size() < aL1+bL2+gL3){
+     data->GlobalAdd(globalView[tmp]);
+     tmp ++;
+     if(tmp == (int) globalView.size()){
+       tmp = 0;
+     }
+  }
 }

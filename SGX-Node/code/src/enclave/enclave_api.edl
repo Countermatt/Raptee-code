@@ -1,12 +1,6 @@
 enclave {
     from "sgx_tae_service.edl" import *;
 
-    untrusted {
-        void ocall_print_string([in,string] const char *str);
-
-        void* ocall_malloc(size_t size);
-        void ocall_free([user_check] void *ptr);
-    };
 
     trusted {
         
@@ -50,58 +44,5 @@ enclave {
             [out]           unsigned int* ansSize,
                        Data* data);
 
-
-        public int ecall_InitData(
-                                    unsigned int viewSize, 
-                                    unsigned int gossipSize,
-                                    unsigned int histPeriod,
-                                    unsigned long histSize,
-                                    float histExponent, 
-            [in,size=bsIPsSize]     char* bsIPs, 
-                                    unsigned int bsIPsSize, 
-            [in,size=myselfSize]    char* myself,
-                                    unsigned int myselfSize,
-            [in,size=privkeySize]   char* privkey,
-                                    unsigned int privkeySize,
-                                    unsigned int debug
-        );
-
-        public int ecall_SendRequest(
-            [user_check]    char** req, 
-            [out]           unsigned int* reqSize, 
-            [user_check]    char** destIP, 
-            [out]           unsigned int* destIPSize
-        );
-
-        public int ecall_ReceiveAnswer(
-            [in,size=ansSize]   char* ans, 
-                                unsigned int ansSize, 
-            [in,size=reqSize]   char* req, 
-                                unsigned int reqSize
-        );
-
-        public int ecall_ReceiveRequest(
-            [user_check]        char** ans, 
-            [out]               unsigned int* ansSize, 
-            [in,size=reqSize]   char* req, 
-                                unsigned int reqSize
-        );
-
-        public int ecall_GetHistoryView(
-            [user_check]    char** marshaled, 
-            [out]           unsigned int* marshaledSize
-        );
-
-        public int ecall_GetSgxView(
-            [user_check]    char** marshaled, 
-            [out]           unsigned int* marshaledSize
-        );
-
-        public int ecall_RebuildRoute(
-            [user_check]        char** ans, 
-            [out]               unsigned int* ansSize, 
-            [in,size=reqSize]   char* req, 
-                                unsigned int reqSize
-        );
     };
 };
