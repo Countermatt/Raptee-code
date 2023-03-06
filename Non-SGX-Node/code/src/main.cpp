@@ -10,37 +10,27 @@
 #include "brahms/Brahms.hpp"
 #include "RPS.hpp"
 
-int main(int argc, char* argv[]) {
 
+int main(int argc, char* argv[]) {
 
   cxxopts::Options options("Brahms", "Implementation of Brahms in C++");
 
   std::string bsIPs;
-  int rpsPort = 10338;
+  int rpsPort = 10337;
 
-  bsIPs.append("127.0.0.2,127.0.0.2,127.0.0.2,127.0.0.2,127.0.0.3,127.0.0.2");
+  bsIPs.append("127.0.0.1,127.0.0.1,127.0.0.1,127.0.0.1,127.0.0.1,127.0.0.1");
 
-  std::string tmpDir;
-  std::string sgxId;
-  std::string byzIP;
-  int byz;
 
   options.add_options()
-      ("bs_ips", "Other nodes' IPs for bootstrap (comma separated)", cxxopts::value<std::string>(bsIPs))
+      ("bs_ips", "Other nodes' IPs for bootstrap (comma separated)",
+        cxxopts::value<std::string>(bsIPs))
       ("rps_port", "Port of RPS process", cxxopts::value<int>(rpsPort))
-      ("is_byz", "is the node byzantine (0 yes, 1 no)", cxxopts::value<int>(byz))
-      ("is_byz", "Other byzantine nodes IPs", cxxopts::value<std::string>(byzIP))
     ;
 
   auto opts = options.parse(argc, argv);
 
-  if (opts.count("help")) {
-    std::cout << options.help() << std::endl;
-    return EXIT_SUCCESS;
-  }
+  auto rps = std::make_shared<RPS>(rpsPort, bsIPs);
 
-//Lancement du RPS
-  auto rps = std::make_shared<RPS>(rpsPort, bsIPs, sgxId, byz, byzIP);
   while (true)
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
 

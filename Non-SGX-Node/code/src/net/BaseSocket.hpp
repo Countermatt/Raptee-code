@@ -7,7 +7,7 @@
 
 // Inspired by: https://github.com/Loki-Astari/Examples/tree/master/Version2
 
-#define SOCKET_REUSE_ADDR 1
+#define SOCKET_REUSE_ADDR 0
 
 // An RAII base class for handling sockets.
 // Socket is movable but not copyable.

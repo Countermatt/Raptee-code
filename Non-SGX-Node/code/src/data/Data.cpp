@@ -3,12 +3,12 @@
 #include <time.h>
 #include <string>
 #include <vector>
-#include <algorithm>
+#include <functional>
+#include <iostream>
 
 #include "data/Data.hpp"
 #include "sha256/SHA256.hpp"
 #include "utils/string.hpp"
-
 using namespace std;
 
 
@@ -47,11 +47,19 @@ void Data::PushAdd(std::string element){
 void Data::GlobalAdd(std::string element){
   mGlobalView.push_back(element);
 }
-void Data::SGXAdd(std::string element){
-  mSGXView.push_back(element);
-}
-void Data::SamplerAdd(std::string element){
-  mSamplerView.push_back(element);
+void Data::SamplerAdd(std::string element, int samplersize){
+  if( samplersize >= SamplerView().size()){
+    mSamplerView.push_back(element);
+  }
+  else{
+    std::hash<std::string> mhash = Hasher();
+    for (int i = 0; i < mSamplerView.size(); i++) {
+      if (mhash(element) > mhash(mSamplerView[i])) {
+              mSamplerView[i] = element;
+              break;
+      }
+    }
+  }
 }
 void Data::StreamAdd(std::string element){
   mStreamView.push_back(element);
@@ -70,18 +78,13 @@ void Data::SamplerRemove(int i){
   }
 }
 
-void Data::GlobalRemove(int i){
-  std::vector<std::string> temp;
-  temp = GlobalView();
-  mGlobalView.clear();
-  mGlobalView.shrink_to_fit();
-
-  for(int k = 0; k < (int) temp.size(); k++){
-    if(k != i){
-      mGlobalView.push_back(temp[k]);
-    }
+void Data::DisplayGlobal() {
+  std::vector<std::string> view = GlobalView();
+  for (const auto& element : view) {
+    std::cout << element << " ";
   }
-}
+  std::cout << std::endl;
+} 
 
 void Data::PullReset(){
   mPullView.clear();
@@ -99,31 +102,7 @@ void Data::StreamReset(){
   mStreamView.clear();
   mStreamView.shrink_to_fit();
 }
-void Data::SGXReset(){
-  mSGXView.clear();
-  mSGXView.shrink_to_fit();
-}
 
 void Data::SamplerResize(){
   mSamplerView.shrink_to_fit();
-}
-
-int Data::SGXfind(std::string element){
-  auto result = std::find(mSGXView.begin(), mSGXView.end(), element);
-  if(result != std::end(mSGXView)){
-    return 0;
-  }
-  else{
-    return 1;
-  }
-}
-
-int Data::Globalfind(std::string element){
-  auto result = std::find(mGlobalView.begin(), mGlobalView.end(), element);
-  if(result != std::end(mGlobalView)){
-    return 0;
-  }
-  else{
-    return 1;
-  }
 }

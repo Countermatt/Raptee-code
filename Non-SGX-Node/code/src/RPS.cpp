@@ -16,27 +16,22 @@
 #include "RPS.hpp"
 
 
+
+
 using namespace std;
 
-RPS::RPS(int rpsTcpPort, std::string bootstrapIP, std::string sgxId, int byz, std::string byzIP)
+RPS::RPS(int rpsTcpPort, std::string bootstrapIP)
     : mListener(make_shared<TCPListener>(rpsTcpPort)),
-    mRpsTcpPort(rpsTcpPort), mPushReqCnt(0), mPullReqCnt(0), mPingReqCnt(0), mData(), mBrahms(), mCyclonSize(10), mbyz(byz)
+    mRpsTcpPort(rpsTcpPort), mPushReqCnt(0), mPullReqCnt(0), mPingReqCnt(0), mData(), mBrahms()
 {
 
   std::vector<std::string> btstIP;
   splitString(btstIP, bootstrapIP, ',');
 
-  std::vector<std::string> sgxIds;
-  splitString(sgxIds, sgxId, ',');
-
   for(int i = 0; i < (int) btstIP.size(); i++){
+
     mData.GlobalAdd(btstIP[i]);
   }
-
-  for(int i = 0; i < (int) sgxIds.size(); i++){
-    mData.SGXAdd(sgxIds[i]);
-  }
-
   mListenerThread = thread(&RPS::listeningThread, this);
   mSenderThread = thread(&RPS::sendingThread, this);
 
@@ -65,7 +60,7 @@ void RPS::sendingThread()      // initiate RPS Request every RPS_SYNC_TIME
     mData.PushReset();
     mData.StreamReset();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(10000)); //RPS period
+
 
     if(al1 != 0){
       for(int i = 0; i < al1; i++){
@@ -73,6 +68,9 @@ void RPS::sendingThread()      // initiate RPS Request every RPS_SYNC_TIME
 
       }
     }
+
+    std::cout << "fin push \n" << std::endl;
+
     if(bl2 != 0){
       for(int i = 0; i < bl2; i++){
 
@@ -80,22 +78,21 @@ void RPS::sendingThread()      // initiate RPS Request every RPS_SYNC_TIME
       }
     }
 
-    int samplersize = mBrahms.SamplerSize();
+  int samplersize = mBrahms.SamplerSize();
+  std::cout << "fin pull \n" << std::endl;
 
     for(int i = 0; i < samplersize; i++){
       RPS::samplerRequest(i);
     }
 
-    mBrahms.MergeView(al1, bl2, gl3, &mData);
-
-
-  tour++;
-  /*
-  for (unsigned long int i  = 0; i < mData.GlobalView().size(); i++)
-      cout << mData.GlobalView()[i] << endl;
-  */
-  }
+  std::cout << "fin sampler \n" << std::endl;
   
+  mBrahms.MergeView(al1, bl2, gl3, &mData);
+  mData.DisplayGlobal();
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  tour++;
+  }
+
 }
 
 void RPS::listeningThread()
@@ -235,7 +232,7 @@ void RPS::pullRequest()
     std::vector<std::string> request;
     splitString(request, ans, ansSize, ';');
     auto requestip = request[2];
-    auto nodeId = request[0];
+
 
     res = mBrahms.Pull_Receive_Reply(requestip, &mData);
     if (res != 0) {
@@ -388,7 +385,6 @@ void RPS::ReceiveRequest(shared_ptr<TCPConnection> conn)
   //Push Process
   else if(type == 0){
     auto ip = request[2];
-    auto nodeId = request[0];
     mBrahms.Push_Receive_Request(ip, &mData);
   }
 
@@ -413,11 +409,4 @@ void RPS::ReceiveRequest(shared_ptr<TCPConnection> conn)
     conn->Close();
     if (ans != nullptr) delete[] ans;
   }
-}
-
-
-
-void RPS::byz_attack(int byz, std::string byzIP) //Function dedicated for byzantine attack
-{
-
 }

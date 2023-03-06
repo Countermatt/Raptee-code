@@ -23,7 +23,7 @@ using namespace std;
 class RPS {
 
 public:
-  RPS(int rpsTcpPort, std::string bootstrapIP, std::string sgxId, int byz, std::string byzIP);
+  RPS(int rpsTcpPort, std::string bootstrapIP);
 
   void sendingThread();
   void listeningThread();
@@ -33,7 +33,6 @@ public:
   void ReceiveRequest(shared_ptr<TCPConnection> conn);
   void samplerRequest(int i);
   void samplerReply();
-  void byz_attack(int byz, std::string byzIP);
 
 private:
 
@@ -45,8 +44,6 @@ private:
   unsigned int mPushReqCnt, mPullReqCnt, mPingReqCnt;
   Data mData;
   Brahms mBrahms;
-  unsigned int mCyclonSize;
-  int mbyz;
 };
 
 

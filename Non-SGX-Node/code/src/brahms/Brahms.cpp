@@ -5,10 +5,10 @@
 #include <ostream>
 
 Brahms::Brahms(){
-  mAL1 = 50;
-  mBL2 = 50;
+  mAL1 = 3;
+  mBL2 = 3;
   mGL3 = 0;
-  mSamplerSize = 10;
+  mSamplerSize = 5;
 }
 
 //Push
@@ -214,38 +214,15 @@ void Brahms::MergeView(int aL1,
   data->GlobalReset();
 
   for(int i = 0; i < aL1; i++){
-    auto e = data->RandomElement(pushView);
-    if(data->Globalfind(e)){
-      data->GlobalAdd(e);
-    }
-    
+    data->GlobalAdd(data->RandomElement(pushView));
   }
 
   for(int i = 0; i < bL2; i++){
-    //data->GlobalAdd(data->RandomElement(pullView));
-    auto e = data->RandomElement(pullView);
-    
-    if(data->Globalfind(e)){
-      data->GlobalAdd(e);
-    }
+    data->GlobalAdd(data->RandomElement(pullView));
   }
 
   for(int i = 0; i < gL3; i++){
-    //data->GlobalAdd(data->RandomElement(sampleView));
-    auto e = data->RandomElement(sampleView);
-    if(data->Globalfind(e)){
-      data->GlobalAdd(e);
-    }
-  }
-  int tmp = 0;
-  auto globalView = data->GlobalView();
-
-  while ((int) data->GlobalView().size() < aL1+bL2+gL3){
-     data->GlobalAdd(globalView[tmp]);
-     tmp ++;
-     if(tmp == (int) globalView.size()){
-       tmp = 0;
-     }
+    data->GlobalAdd(data->RandomElement(sampleView));
   }
 
 }
